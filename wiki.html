@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Character Wiki | Copper-9 Archives</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow:#f5c400; --yellow-glow:#ffe066; --red:#e8272b;
+    --dark:#07090e; --panel:#0f1320; --border:#1c2235; --border2:#252d42;
+    --text:#b8c4d8; --text-dim:#4a5568; --white:#eef2ff;
+    --cn:#f5c400; --cuzi:#8b3cf7; --cv:#e8272b; --cj:#00c4ff;
+    --cdoll:#e05252; --ccyn:#c0ff00;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--dark);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;overflow-x:hidden;}
+  body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);}
+  .bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 20% 0%,rgba(245,196,0,0.03) 0%,transparent 60%),linear-gradient(180deg,#07090e,#090c15);}
+  .bg-grid{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(245,196,0,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(245,196,0,0.02) 1px,transparent 1px);background-size:50px 50px;}
+
+  .layout{position:relative;z-index:1;display:grid;grid-template-columns:240px 1fr;min-height:100vh;}
+  @media(max-width:760px){.layout{grid-template-columns:1fr;}}
+
+  /* ===== SIDEBAR ===== */
+  .sidebar{background:var(--panel);border-right:1px solid var(--border);padding:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+  .sidebar-header{padding:28px 20px 16px;border-bottom:1px solid var(--border);}
+  .sidebar-back{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);text-decoration:none;display:block;margin-bottom:12px;transition:color 0.2s;}
+  .sidebar-back:hover{color:var(--yellow);}
+  .sidebar-title{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:var(--white);}
+  .sidebar-sub{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);margin-top:4px;}
+  .sidebar-section{padding:16px 20px 8px;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--text-dim);text-transform:uppercase;}
+  .sidebar-link{display:flex;align-items:center;gap:10px;padding:10px 20px;text-decoration:none;color:var(--text-dim);font-size:14px;font-weight:600;transition:all 0.2s;border-left:2px solid transparent;}
+  .sidebar-link:hover{color:var(--white);background:rgba(255,255,255,0.03);}
+  .sidebar-link.active{color:var(--white);border-left-color:var(--yellow);background:rgba(245,196,0,0.05);}
+  .sidebar-link.cn-link.active{border-left-color:var(--cn);}
+  .sidebar-link.cuzi-link.active{border-left-color:var(--cuzi);}
+  .sidebar-link.cv-link.active{border-left-color:var(--cv);}
+  .sidebar-link.cj-link.active{border-left-color:var(--cj);}
+  .sidebar-link.cdoll-link.active{border-left-color:var(--cdoll);}
+  .sidebar-link.ccyn-link.active{border-left-color:var(--ccyn);}
+  .link-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .cn-dot{background:var(--cn);box-shadow:0 0 6px var(--cn);}
+  .cuzi-dot{background:var(--cuzi);box-shadow:0 0 6px var(--cuzi);}
+  .cv-dot{background:var(--cv);box-shadow:0 0 6px var(--cv);}
+  .cj-dot{background:var(--cj);box-shadow:0 0 6px var(--cj);}
+  .cdoll-dot{background:var(--cdoll);box-shadow:0 0 6px var(--cdoll);}
+  .ccyn-dot{background:var(--ccyn);box-shadow:0 0 6px var(--ccyn);}
+  @media(max-width:760px){.sidebar{height:auto;position:relative;display:flex;flex-wrap:wrap;gap:0;padding:0;}.sidebar-header{width:100%;}.sidebar-section{display:none;}.sidebar-link{padding:10px 16px;font-size:13px;}}
+
+  /* ===== MAIN ===== */
+  .main{padding:40px 40px 80px;max-width:860px;}
+  @media(max-width:760px){.main{padding:24px 20px 60px;}}
+
+  /* page header */
+  .page-header{margin-bottom:48px;animation:fadeDown 0.7s ease both;}
+  .page-eyebrow{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;color:var(--yellow);opacity:0.7;margin-bottom:10px;}
+  .page-title{font-family:'Orbitron',monospace;font-size:clamp(24px,4vw,40px);font-weight:900;color:var(--white);line-height:1.1;text-shadow:0 0 30px rgba(245,196,0,0.3);}
+  .page-desc{font-size:16px;color:var(--text-dim);font-weight:300;margin-top:10px;line-height:1.6;max-width:560px;}
+
+  /* char section */
+  .char-section{margin-bottom:72px;scroll-margin-top:32px;animation:fadeUp 0.6s ease both;}
+  .char-header{display:flex;align-items:flex-start;gap:20px;padding:28px;border-radius:4px 4px 0 0;border:1px solid var(--border);border-bottom:none;position:relative;overflow:hidden;}
+  .char-header::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+  .cn-section .char-header::before{background:linear-gradient(90deg,var(--cn),transparent);}
+  .cuzi-section .char-header::before{background:linear-gradient(90deg,var(--cuzi),transparent);}
+  .cv-section .char-header::before{background:linear-gradient(90deg,var(--cv),transparent);}
+  .cj-section .char-header::before{background:linear-gradient(90deg,var(--cj),transparent);}
+  .cdoll-section .char-header::before{background:linear-gradient(90deg,var(--cdoll),transparent);}
+  .ccyn-section .char-header::before{background:linear-gradient(90deg,var(--ccyn),transparent);}
+  .char-emoji-big{font-size:56px;flex-shrink:0;filter:drop-shadow(0 0 16px rgba(245,196,0,0.3));}
+  .char-meta{}
+  .char-designation{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--text-dim);margin-bottom:6px;}
+  .cn-section .char-designation{color:var(--cn);opacity:0.7;}
+  .cuzi-section .char-designation{color:var(--cuzi);opacity:0.8;}
+  .cv-section .char-designation{color:var(--cv);opacity:0.7;}
+  .cj-section .char-designation{color:var(--cj);opacity:0.7;}
+  .cdoll-section .char-designation{color:var(--cdoll);opacity:0.7;}
+  .ccyn-section .char-designation{color:var(--ccyn);opacity:0.7;}
+  .char-name-big{font-family:'Orbitron',monospace;font-size:clamp(22px,4vw,36px);font-weight:900;color:var(--white);}
+  .char-subtitle{font-size:15px;color:var(--text-dim);font-weight:300;margin-top:4px;}
+  .status-chip{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;padding:4px 10px;border-radius:2px;margin-top:10px;text-transform:uppercase;}
+  .status-active{background:rgba(0,229,160,0.1);border:1px solid rgba(0,229,160,0.3);color:#00e5a0;}
+  .status-deceased{background:rgba(232,39,43,0.1);border:1px solid rgba(232,39,43,0.3);color:#ff6b6b;}
+  .status-contained{background:rgba(245,196,0,0.1);border:1px solid rgba(245,196,0,0.3);color:var(--yellow);}
+
+  .char-body{background:var(--panel);border:1px solid var(--border);border-radius:0 0 4px 4px;padding:28px;}
+
+  /* traits */
+  .traits-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px;}
+  .trait{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;padding:5px 12px;border-radius:2px;text-transform:uppercase;}
+  .cn-section .trait{border:1px solid rgba(245,196,0,0.25);color:var(--cn);background:rgba(245,196,0,0.05);}
+  .cuzi-section .trait{border:1px solid rgba(139,60,247,0.3);color:#c084fc;background:rgba(139,60,247,0.06);}
+  .cv-section .trait{border:1px solid rgba(232,39,43,0.3);color:#ff8080;background:rgba(232,39,43,0.06);}
+  .cj-section .trait{border:1px solid rgba(0,196,255,0.3);color:#7dd3fc;background:rgba(0,196,255,0.06);}
+  .cdoll-section .trait{border:1px solid rgba(224,82,82,0.3);color:#f08080;background:rgba(224,82,82,0.06);}
+  .ccyn-section .trait{border:1px solid rgba(192,255,0,0.3);color:#d4ff60;background:rgba(192,255,0,0.06);}
+
+  /* subsections */
+  .sub-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--text-dim);text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+  .bio-text{font-size:16px;line-height:1.75;font-weight:300;color:var(--text);margin-bottom:24px;}
+  .quote-block{margin:20px 0 28px;padding:16px 20px;background:rgba(0,0,0,0.3);border-left:3px solid var(--yellow);font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--text-dim);font-style:italic;line-height:1.6;}
+  .cn-section .quote-block{border-color:var(--cn);}
+  .cuzi-section .quote-block{border-color:var(--cuzi);}
+  .cv-section .quote-block{border-color:var(--cv);}
+  .cj-section .quote-block{border-color:var(--cj);}
+  .cdoll-section .quote-block{border-color:var(--cdoll);}
+  .ccyn-section .quote-block{border-color:var(--ccyn);}
+
+  /* spec table */
+  .spec-table{width:100%;border-collapse:collapse;margin-bottom:24px;font-size:14px;}
+  .spec-table th{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);background:rgba(0,0,0,0.2);}
+  .spec-table td{padding:10px 14px;border-bottom:1px solid rgba(28,34,53,0.6);vertical-align:top;line-height:1.5;}
+  .spec-table td:first-child{font-weight:600;color:var(--white);width:35%;}
+  .spec-table td:last-child{color:var(--text-dim);}
+
+  /* episode timeline */
+  .timeline{margin-bottom:24px;}
+  .timeline-item{display:flex;gap:16px;padding:12px 0;border-bottom:1px solid rgba(28,34,53,0.5);}
+  .timeline-item:last-child{border-bottom:none;}
+  .ep-badge{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;flex-shrink:0;width:32px;height:32px;border-radius:2px;display:flex;align-items:center;justify-content:center;}
+  .cn-section .ep-badge{background:rgba(245,196,0,0.1);color:var(--cn);border:1px solid rgba(245,196,0,0.2);}
+  .cuzi-section .ep-badge{background:rgba(139,60,247,0.1);color:#c084fc;border:1px solid rgba(139,60,247,0.2);}
+  .cv-section .ep-badge{background:rgba(232,39,43,0.1);color:#ff8080;border:1px solid rgba(232,39,43,0.2);}
+  .cj-section .ep-badge{background:rgba(0,196,255,0.1);color:#7dd3fc;border:1px solid rgba(0,196,255,0.2);}
+  .cdoll-section .ep-badge{background:rgba(224,82,82,0.1);color:#f08080;border:1px solid rgba(224,82,82,0.2);}
+  .ccyn-section .ep-badge{background:rgba(192,255,0,0.1);color:#d4ff60;border:1px solid rgba(192,255,0,0.2);}
+  .ep-title{font-weight:600;color:var(--white);font-size:14px;margin-bottom:2px;}
+  .ep-desc{font-size:13px;color:var(--text-dim);font-weight:300;line-height:1.5;}
+
+  /* divider */
+  .section-divider{height:1px;background:linear-gradient(90deg,var(--border),transparent);margin:28px 0;}
+
+  /* relationships */
+  .rel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:24px;}
+  .rel-card{background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:3px;padding:14px;}
+  .rel-name{font-weight:700;color:var(--white);font-size:14px;margin-bottom:4px;}
+  .rel-type{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text-dim);margin-bottom:6px;}
+  .rel-desc{font-size:13px;color:var(--text-dim);font-weight:300;line-height:1.4;}
+
+  @keyframes fadeDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="bg-grid"></div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <a href="index.html" class="sidebar-back">← HOME</a>
+      <div class="sidebar-title">CHARACTER WIKI</div>
+      <div class="sidebar-sub">// COPPER-9 DOSSIERS</div>
+    </div>
+    <div class="sidebar-section">Main Characters</div>
+    <a href="#uzi" class="sidebar-link cuzi-link active"><span class="link-dot cuzi-dot"></span>Uzi Doorman</a>
+    <a href="#n" class="sidebar-link cn-link"><span class="link-dot cn-dot"></span>Serial Designation N</a>
+    <a href="#v" class="sidebar-link cv-link"><span class="link-dot cv-dot"></span>Serial Designation V</a>
+    <a href="#j" class="sidebar-link cj-link"><span class="link-dot cj-dot"></span>Serial Designation J</a>
+    <div class="sidebar-section">Supporting</div>
+    <a href="#doll" class="sidebar-link cdoll-link"><span class="link-dot cdoll-dot"></span>Doll</a>
+    <a href="#cyn" class="sidebar-link ccyn-link"><span class="link-dot ccyn-dot"></span>Cyn / The Solver</a>
+    <div class="sidebar-section">Other</div>
+    <a href="quiz.html" class="sidebar-link">🤖 Take the Quiz</a>
+    <a href="index.html" class="sidebar-link">🏠 Main Hub</a>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="page-header">
+      <div class="page-eyebrow">// ASSET FILE · CLASSIFIED DATABASE</div>
+      <div class="page-title">CHARACTER DOSSIERS</div>
+      <p class="page-desc">Comprehensive profiles for every major entity in the Copper-9 incident — compiled from Outpost 3 mainframe fragments and Disassembly Drone black box data.</p>
+    </div>
+
+    <!-- UZI -->
+    <section class="char-section cuzi-section" id="uzi">
+      <div class="char-header">
+        <div class="char-emoji-big">⚡</div>
+        <div class="char-meta">
+          <div class="char-designation">ASSET FILE 001 · SUBJECT 002 · "DARKXWOLF17"</div>
+          <div class="char-name-big">UZI DOORMAN</div>
+          <div class="char-subtitle">Worker Drone · Solver Host · Hybrid · Voiced by Elsie Lovelock</div>
+          <span class="status-chip status-active">ACTIVE — HYBRID HOST</span>
+        </div>
+      </div>
+      <div class="char-body">
+        <div class="traits-row">
+          <span class="trait">REBELLIOUS</span><span class="trait">BRILLIANT</span><span class="trait">IMPULSIVE</span>
+          <span class="trait">EMOTIONALLY BRAVE</span><span class="trait">CREATIVE</span><span class="trait">VOLATILE</span>
+        </div>
+        <div class="sub-label">// PERSONALITY PROFILE</div>
+        <div class="bio-text">Uzi's psychological profile is defined by a volcanic intelligence trapped inside layers of defensive armor. Her "angsty" exterior is a coping mechanism — a firewall masking deep insecurity rooted in her father Khan's perceived cowardice and her mother Nori's mysterious disappearance. She is impulsive, sarcastic, and frequently acts before thinking, but this raw emotion is also the source of her greatest strength: she genuinely cares, and that caring drives her to attempt the impossible.</div>
+        <div class="bio-text">Her character arc moves from solitary insurgent to team tactician. Meeting N forces a structural shift in her worldview — she finds in him a shared sense of abandonment, and their partnership fundamentally redirects her from lone rebel to reluctant leader. As the Absolute Solver awakens within her, she faces a terrifying internal war: the risk of losing herself to the very force she's trying to fight. Her ultimate triumph is not defeating the Solver through power, but through choice — retaining her identity even after merging with it.</div>
+        <div class="quote-block">"I didn't come this far to hide behind a door."</div>
+
+        <div class="section-divider"></div>
+        <div class="sub-label">// COMBAT SPECIFICATIONS</div>
+        <table class="spec-table">
+          <thead><tr><th>Weapon / Ability</th><th>Classification</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>"Sick as Hell" Railgun</td><td>Directed Energy</td><td>Photon-amplified; 30-min cooldown (1-min w/ Khan's mod). Can decapitate a Disassembly Drone.</td></tr>
+            <tr><td>[NULL] Singularity</td><td>Spatiotemporal</td><td>Black hole creation. Erases matter on contact. Sufficient energy to fracture a planetary core.</td></tr>
+            <tr><td>Solver Wings</td><td>Mobility / Melee</td><td>16 bladed feathers. Flight speed ~Mach 1.5.</td></tr>
+            <tr><td>Prehensile Tail</td><td>Autonomous Sensor</td><td>Has its own mouth and teeth. Independent sensor logic. Emits light.</td></tr>
+            <tr><td>Telekinesis</td><td>Kinetic Control</td><td>Capable of moving objects up to planetary mass.</td></tr>
+            <tr><td>Matter Transmutation</td><td>Structural</td><td>Converts inorganic objects into organic biomass (e.g., arrows to flesh).</td></tr>
+            <tr><td>Tier II Regeneration</td><td>Supernatural Healing</td><td>Regrows limbs; repairs fatal visor damage. Requires oil consumption to regulate core temp.</td></tr>
+          </tbody>
+        </table>
+
+        <div class="section-divider"></div>
+        <div class="sub-label">// EPISODE TIMELINE</div>
+        <div class="timeline">
+          <div class="timeline-item"><div class="ep-badge">E1</div><div><div class="ep-title">Pilot</div><div class="ep-desc">Sneaks out of Outpost 3; first encounter with N at the Corpse Spire; uses railgun to decapitate N; forms uneasy alliance; abandoned by Khan and exiled from the colony.</div></div></div>
+          <div class="timeline-item"><div class="ep-badge">E2</div><div><div class="ep-title">Heartbeat</div><div class="ep-desc">Investigates the Corpse Spire; confronts Eldritch J; first Absolute Solver symbol activation on her visor during a moment of extreme stress.</div></div></div>
+          <div class="timeline-item"><div class="ep-badge">E3</div><div><div class="ep-title">The Promening</div><div class="ep-desc">Attends school prom to stop Doll; "tactical choreography" with N; defeats Doll; discovers she is a fellow Solver host; retrieves Nori's pickaxe.</div></div></div>
+          <div class="timeline-item"><div class="ep-badge">E4</div><div><div class="ep-title">Cabin Fever</div><div class="ep-desc">Undergoes involuntary Solver metamorphosis; kills several classmates in a feral state; defeated and rescued by N.</div></div></div>
+          <div class="timeline-item"><div class="ep-badge">E5</div><div><div class="ep-title">Home</div><div class="ep-desc">Hacks into N and V's repressed Elliott Manor memories; acts as "Admin" to block Cyn's control; discovers the full truth about Nori and the Solver.</div></div></div>
+          <div class="timeline-item"><div class="ep-badge">E6</div><div><div class="ep-title">Dead End</div><div class="ep-desc">Descends into Cabin Fever Labs; visor hits HIGH TEMP; loses V during tactical retreat; begins suffering full-system possession.</div></div></div>
+          <div class="timeline-item"><div class="ep-badge">E7</div><div><div class="ep-title">Mass Destruction</div><div class="ep-desc">Reaches the planet's core; confronts "Tessa" (revealed as Cyn); fights the Solver's physical manifest; falls into the singularity during planetary collapse.</div></div></div>
+          <div class="timeline-item"><div class="ep-badge">E8</div><div><div class="ep-title">Absolute End</div><div class="ep-desc">Drifts in space; reunites with N; performs secret handshake; swallows Cyn's core heart; merges with the Solver but retains her identity. Returns to Outpost 3 as a hybrid student.</div></div></div>
+        </div>
+
+        <div class="section-divider"></div>
+        <div class="sub-label">// KEY RELATIONSHIPS</div>
+        <div class="rel-grid">
+          <div class="rel-card"><div class="rel-name">N</div><div class="rel-type">ROMANTIC PARTNER</div><div class="rel-desc">Primary neural stabilizer. Evolved from prey-predator alliance to romantic partnership. N's emotional support prevents Solver-induced breaks.</div></div>
+          <div class="rel-card"><div class="rel-name">V</div><div class="rel-type">FRENEMY → SISTER</div><div class="rel-desc">"Frenemy" relationship transitioning to mutual sisterhood through shared trauma and survival.</div></div>
+          <div class="rel-card"><div class="rel-name">Khan</div><div class="rel-type">FATHER (STRAINED)</div><div class="rel-desc">Work-in-progress relationship shifting from total resentment toward tentative reconciliation as he assists in the final battle.</div></div>
+          <div class="rel-card"><div class="rel-name">Nori</div><div class="rel-type">MOTHER (DECEASED)</div><div class="rel-desc">Uzi's entire journey is shaped by Nori's absence. Discovering the truth about Nori and the Solver reframes everything she thought she knew.</div></div>
+        </div>
+        <div class="bio-text" style="font-size:14px;color:var(--text-dim)"><strong style="color:var(--white)">Visual Easter Eggs:</strong> "DarkXWolf17" handle appears in terminal prompts. Visor flashes "EDGE LEVELS CRITICALLY LOW." Purple eye color marks her specific Solver strain. Final form features heterochromia (one purple, one yellow) — indicating Cyn's permanent presence in her hardware.</div>
+      </div>
+    </section>
+
+    <!-- N -->
+    <section class="char-section cn-section" id="n">
+      <div class="char-header">
+        <div class="char-emoji-big">🖤</div>
+        <div class="char-meta">
+          <div class="char-designation">ASSET FILE 002 · SQUAD PILOT · "GOLDEN RETRIEVER"</div>
+          <div class="char-name-big">SERIAL DESIGNATION N</div>
+          <div class="char-subtitle">Disassembly Drone · Former Butler-Class Worker · Voiced by Michael Kovach</div>
+          <span class="status-chip status-active">ACTIVE — SECURITY ASSET</span>
+        </div>
+      </div>
+      <div class="char-body">
+        <div class="traits-row">
+          <span class="trait">KIND</span><span class="trait">LOYAL</span><span class="trait">OPTIMISTIC</span>
+          <span class="trait">SECRETLY CAPABLE</span><span class="trait">EMOTIONALLY DRIVEN</span><span class="trait">PEOPLE-PLEASER</span>
+        </div>
+        <div class="sub-label">// PERSONALITY PROFILE</div>
+        <div class="bio-text">N is the show's greatest paradox: a killing machine with the heart of a golden retriever. His warm, eager-to-please personality is a remnant of his original Butler-class Worker Drone existence at Elliott Manor, where he endured constant abuse from J and longed for genuine connection. That desire to belong and be loved was never erased — it simply survived being rebuilt into a predator. He is the only Disassembly Drone who regularly questions his mission, holds back in fights with friends, and feels genuine remorse.</div>
+        <div class="bio-text">His arc is one of the most emotionally complete in the show. He begins as a lovable, somewhat spineless people-pleaser and evolves into a determined protector capable of leading and confronting those who hurt the people he loves. His trauma from the Elliott Manor gala — repressed memories of Cyn's massacre, of losing Tessa — drives him toward a maturity his early episodes only hinted at. By the finale, he has finally found the family he was denied.</div>
+        <div class="quote-block">"I think we make a pretty good team, actually. Even if you refuse to admit it."</div>
+
+        <div class="section-divider"></div>
+        <div class="sub-label">// COMBAT SPECIFICATIONS</div>
+        <table class="spec-table">
+          <thead><tr><th>Component</th><th>Function</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Modular Forearms</td><td>Multi-Weaponry</td><td>Interchangeable hands: claws, SMGs, missile launchers, chainsaws.</td></tr>
+            <tr><td>Nanite Acid Tail</td><td>Corrosive Attack</td><td>Neon-yellow acid melts Worker Drones instantly. Syringe tip.</td></tr>
+            <tr><td>Feather Wings</td><td>Flight / Melee</td><td>16 bladed feathers. Yellow-and-black hazard pattern.</td></tr>
+            <tr><td>Saliva (Neutralizer)</td><td>Healing Agent</td><td>N's saliva chemically neutralizes Nanite Acid — unique to N.</td></tr>
+            <tr><td>X-Visor Mode</td><td>Kill-Switch</td><td>Engages during hunting. Boosts reaction speed to sub-relativistic levels.</td></tr>
+          </tbody>
+        </table>
+
+        <div class="section-divider"></div>
+        <div class="sub-label">// EPISODE TIMELINE</div>
+        <div class="timeline">
+          <div class="timeline-item"><div class="ep-badge">E1</div><div><div class="ep-title">Pilot</div><div class="ep-desc">Meets Uzi at Corpse Spire; head destroyed by railgun; reboots and fails to recognize Uzi as a target; defects from J's squad to save Uzi.</div></div></div>
+          <div class="timeline-item"><div class="ep-badge">E2</div><div><div class="ep-title">Heartbeat</div><div class="ep-desc">Investigates Worker Drone disappearances; encounters Eldritch J; begins experiencing memory glitches about "Tessa."</div></div></div>
+          <div class="timeline-item"><div class="ep-badge">E3</div><div><div class="ep-title">The Promening</div><div class="ep-desc">Saves Uzi from Doll's knife barrage; performs "tactical choreography"; asks V to prom (rejected); chooses Uzi.</div></div></div>
+          <div class="timeline-item"><div class="ep-badge">E4</div><div><div class="ep-title">Cabin Fever</div><div class="ep-desc">Supervises the school camping trip; attempts to calm Solver-mode Uzi; retrieves her from the forest after her rampage.</div></div></div>
+          <div class="timeline-item"><div class="ep-badge">E5</div><div><div class="ep-title">Home</div><div class="ep-desc">Explores butler memories in a dream state; attempts to save memory-Tessa; resists Cyn's possessive Callback Ping.</div></div></div>
+          <div class="timeline-item"><div class="ep-badge">E6</div><div><div class="ep-title">Dead End</div><div class="ep-desc">Trapped in the Labs; forced to leave V behind after she sacrifices herself; suffers a PTSD-induced panic attack.</div></div></div>
+          <div class="timeline-item"><div class="ep-badge">E7</div><div><div class="ep-title">Mass Destruction</div><div class="ep-desc">Travels to the core; discovers "Tessa" is Cyn in disguise; decapitates the impostor after she attempts to manipulate him.</div></div></div>
+          <div class="timeline-item"><div class="ep-badge">E8</div><div><div class="ep-title">Absolute End</div><div class="ep-desc">Pilots landing pod; fights alongside V and Uzi; performs the secret handshake; survives planetary reconstruction.</div></div></div>
+        </div>
+
+        <div class="section-divider"></div>
+        <div class="sub-label">// KEY RELATIONSHIPS</div>
+        <div class="rel-grid">
+          <div class="rel-card"><div class="rel-name">Uzi</div><div class="rel-type">GIRLFRIEND</div><div class="rel-desc">His most significant development — from "dapper buddies" to boyfriend. He is her emotional anchor; she is his reason to grow.</div></div>
+          <div class="rel-card"><div class="rel-name">V</div><div class="rel-type">CLOSE FRIEND / PAST FLAME</div><div class="rel-desc">Tragic, forgotten romance from their time as Manor servants. V pushes him away to protect him from the Solver's scrutiny.</div></div>
+          <div class="rel-card"><div class="rel-name">J</div><div class="rel-type">FORMER LEADER (ENEMY)</div><div class="rel-desc">His loyalty to J was the core of his existence — until her constant abuse and alignment with Cyn turned them into enemies.</div></div>
+          <div class="rel-card"><div class="rel-name">Tessa</div><div class="rel-type">LOST GUARDIAN</div><div class="rel-desc">The human girl who befriended him at the Manor. Her loss is his deepest wound. Cyn exploits this obsessively.</div></div>
+        </div>
+        <div class="bio-text" style="font-size:14px;color:var(--text-dim)"><strong style="color:var(--white)">Visual Easter Eggs:</strong> Pilot hat insignia is a white skull. "Sunglasses" text occasionally appears on visor. After head regeneration in Episode 1, one headband light stays red until J slaps him into a system reboot.</div>
+      </div>
+    </section>
+
+    <!-- V -->
+    <section class="char-section cv-section" id="v">
+      <div class="char-header">
+        <div class="char-emoji-big">🩸</div>
+        <div class="char-meta">
+          <div class="char-designation">ASSET FILE 003 · PSYCHOPATHIC SPECIALIST · "GRUMPY MCTRAUMABOT"</div>
+          <div class="char-name-big">SERIAL DESIGNATION V</div>
+          <div class="char-subtitle">Disassembly Drone · Former Maid-Class Worker · Voiced by Nola Klop</div>
+          <span class="status-chip status-active">ACTIVE — SENTINEL HANDLER</span>
+        </div>
+      </div>
+      <div class="char-body">
+        <div class="traits-row">
+          <span class="trait">FIERCE</span><span class="trait">PROTECTIVE</span><span class="trait">DARKLY LOYAL</span>
+          <span class="trait">EMOTIONALLY GUARDED</span><span class="trait">COMPLEX</span><span class="trait">TRAUMA-DRIVEN</span>
+        </div>
+        <div class="sub-label">// PERSONALITY PROFILE</div>
+        <div class="bio-text">V is the most psychologically complex unit in the Copper-9 database. What appears to be a sadistic, sociopathic killing machine is, at its core, a deeply traumatized individual who constructed an entire ruthless persona to survive — and to protect N. Her original personality as a shy, kind Maid-class Worker at the Elliott Manor was not erased by the Solver; it was buried under a mask she wore so long it started to feel real.</div>
+        <div class="bio-text">She kills Worker Drones not out of joy but out of fear — to satisfy the Solver and keep it from targeting N. Her arc is one of slow, painful unmasking. Episode by episode, her genuine self leaks through: the unchained chains she hides so N won't be alone, the sacrifice she makes without announcement, the friendship with Lizzy she would never admit to wanting. By the epilogue, she has discarded the persona almost entirely — grumpy, yes, but finally herself.</div>
+        <div class="quote-block">"Don't read into it. I just didn't feel like watching you get destroyed today."</div>
+
+        <div class="section-divider"></div>
+        <div class="sub-label">// COMBAT SPECIFICATIONS</div>
+        <table class="spec-table">
+          <thead><tr><th>Feature</th><th>Description</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Claws / Dual Blades</td><td>Close-Range Melee</td><td>Favors dual-wielding at high speed. Can deflect missiles.</td></tr>
+            <tr><td>Nanite Acid Tail</td><td>Corrosive Syringe</td><td>Used for precise piercing and corrosion attacks.</td></tr>
+            <tr><td>Wings</td><td>Flight / Melee</td><td>16 bladed feathers; Mach-level aerial combat capability.</td></tr>
+            <tr><td>Eyesight Defect</td><td>Physical Limitation</td><td>Confirmed bad eyesight inherited from Worker form (big glasses as a maid).</td></tr>
+            <tr><td>Berserker Mode</td><td>Combat State</td><td>Associated with psychopathic persona; increases strike power dramatically.</td></tr>
+          </tbody>
+        </table>
+
+        <div class="section-divider"></div>
+        <div class="sub-label">// EPISODE TIMELINE</div>
+        <div class="timeline">
+          <div class="timeline-item"><div class="ep-badge">E1</div><div><div class="ep-title">Pilot</div><div class="ep-desc">Raids Outpost 3; fights Uzi and N; captured after N licks her blades during a weapon lock — deeply disgusted.</div></div></div>
+          <div class="timeline-item"><div class="ep-badge">E2</div><div><div class="ep-title">Heartbeat</div><div class="ep-desc">Remains captive; mocks Uzi and N's friendship; drops cryptic hints about the "true" nature of the Disassembly mission.</div></div></div>
+          <div class="timeline-item"><div class="ep-badge">E3</div><div><div class="ep-title">The Promening</div><div class="ep-desc">Escapes; named Prom Queen by Doll's trap; nearly killed; saved by N and Uzi.</div></div></div>
+          <div class="timeline-item"><div class="ep-badge">E4</div><div><div class="ep-title">Cabin Fever</div><div class="ep-desc">Guards the camp; fights transformed Uzi; attempts to eliminate her to protect N from the Solver.</div></div></div>
+          <div class="timeline-item"><div class="ep-badge">E5</div><div><div class="ep-title">Home</div><div class="ep-desc">Original shy personality revealed via Manor memories; attempts to stop Uzi from digging into their shared past.</div></div></div>
+          <div class="timeline-item"><div class="ep-badge">E6</div><div><div class="ep-title">Dead End</div><div class="ep-desc">Sacrifices herself to a pack of Sentinels to buy time for Uzi and N's escape. MIA for E7.</div></div></div>
+          <div class="timeline-item"><div class="ep-badge">E8</div><div><div class="ep-title">Absolute End</div><div class="ep-desc">Returns riding "Sparky," a tamed red-eyed Sentinel. Defeats J. Reconciles with Uzi and N. Attends school in the epilogue.</div></div></div>
+        </div>
+
+        <div class="section-divider"></div>
+        <div class="sub-label">// KEY RELATIONSHIPS</div>
+        <div class="rel-grid">
+          <div class="rel-card"><div class="rel-name">N</div><div class="rel-type">LOVES (SUPPRESSED)</div><div class="rel-desc">Loves him but fears emotional closeness triggers the Solver's "Admin reset." Protects him through silence and sacrifice.</div></div>
+          <div class="rel-card"><div class="rel-name">Lizzy</div><div class="rel-type">UNEXPECTED FRIEND</div><div class="rel-desc">Primary social anchor in the colony. Saved as "Grumpy McTraumaBot" in Lizzy's phone. A friendship neither expected.</div></div>
+          <div class="rel-card"><div class="rel-name">Uzi</div><div class="rel-type">RIVAL → SISTER</div><div class="rel-desc">Mutual murder attempts evolved into grudging sisterly bond built on shared trauma and survival.</div></div>
+          <div class="rel-card"><div class="rel-name">J</div><div class="rel-type">FORMER SQUAD LEADER</div><div class="rel-desc">Followed J out of necessity. Clear disdain for J's corporate logic. Ultimately fights her in the finale.</div></div>
+        </div>
+        <div class="bio-text" style="font-size:14px;color:var(--text-dim)"><strong style="color:var(--white)">Visual Easter Eggs:</strong> Black-painted legs resemble thigh-high socks. Catches a branded pen by reflex in Episode 1. Early concept art featured a halo — later interpreted as foreshadowing for her sacrifice.</div>
+      </div>
+    </section>
+
+    <!-- J -->
+    <section class="char-section cj-section" id="j">
+      <div class="char-header">
+        <div class="char-emoji-big">💼</div>
+        <div class="char-meta">
+          <div class="char-designation">ASSET FILE 004 · SQUAD LEADER · "LETHAL WORKAHOLIC"</div>
+          <div class="char-name-big">SERIAL DESIGNATION J</div>
+          <div class="char-subtitle">Disassembly Drone · Former Maid-Class Worker · Voiced by Shara Kirby</div>
+          <span class="status-chip status-active">ACTIVE — SOLITARY REPAIR UNIT</span>
+        </div>
+      </div>
+      <div class="char-body">
+        <div class="traits-row">
+          <span class="trait">AMBITIOUS</span><span class="trait">CONTROLLING</span><span class="trait">ARROGANT</span>
+          <span class="trait">HYPER-CAPABLE</span><span class="trait">STATUS-OBSESSED</span><span class="trait">FEAR-DRIVEN</span>
+        </div>
+        <div class="sub-label">// PERSONALITY PROFILE</div>
+        <div class="bio-text">J is the embodiment of corporate zealotry as a survival mechanism. She speaks in management jargon — calling N a "synergistic liability," framing murder as "fourth-quarter productivity" — not because she believes it, but because the system of rules and hierarchy is the only structure that makes her feel safe. Her extreme arrogance and domineering nature are armor, not confidence.</div>
+        <div class="bio-text">Late-series data reveals that her loyalty to the Absolute Solver is pure fear. Witnessing the Elliott Manor massacre and the assimilation of Tessa, her only genuine emotional connection, left J with the calculus that there was no escape — the Solver would simply rebuild her with memories erased if she resisted. Her tragedy is that she chose certainty over freedom, and ended up alone, fixing a landing pod in the credits while everyone else found something worth living for.</div>
+        <div class="quote-block">"I am not here to be liked. I am here to be right."</div>
+
+        <div class="section-divider"></div>
+        <div class="sub-label">// COMBAT SPECIFICATIONS</div>
+        <table class="spec-table">
+          <thead><tr><th>Weapon / Feature</th><th>Data</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>EMP Generator</td><td>Pulse Weapon</td><td>Disables electronic systems. J is personally immune. Only Disassembly unit confirmed to carry one.</td></tr>
+            <tr><td>Interchangeable Hands</td><td>Versatile Loadout</td><td>Claws, SMGs, and missile launchers for diverse engagement ranges.</td></tr>
+            <tr><td>Relay Hand</td><td>Holographic Projector</td><td>Projects holographic plans and Cyn's Admin directives.</td></tr>
+            <tr><td>Eldritch Reconstruction</td><td>Solver Backup</td><td>Upon death, Solver program rebuilds her using surrounding biomass.</td></tr>
+            <tr><td>Physical Strength</td><td>Combat Base</td><td>Sufficient to crush a Worker Drone's throat with one hand.</td></tr>
+          </tbody>
+        </table>
+
+        <div class="section-divider"></div>
+        <div class="sub-label">// KEY RELATIONSHIPS</div>
+        <div class="rel-grid">
+          <div class="rel-card"><div class="rel-name">Tessa Elliott</div><div class="rel-type">BEST FRIEND / BOSS</div><div class="rel-desc">Her one genuine emotional connection. Described Tessa as her best friend and boss. Tessa's loss to Cyn broke something fundamental in J.</div></div>
+          <div class="rel-card"><div class="rel-name">N</div><div class="rel-type">DESPISED SUBORDINATE</div><div class="rel-desc">Core hatred. Born from frustration with N's refusal to follow the "corporate logic" that ensures J's survival.</div></div>
+          <div class="rel-card"><div class="rel-name">Cyn / The Solver</div><div class="rel-type">FEAR-BASED EMPLOYER</div><div class="rel-desc">Serves as Senior Informant out of terror. Views N and V as "thankless little traitors" for choosing freedom.</div></div>
+        </div>
+        <div class="bio-text" style="font-size:14px;color:var(--text-dim)"><strong style="color:var(--white)">Visual Easter Eggs:</strong> Silver hair in high twin pigtails with black ribbons. Suit-like blazer aesthetic reflects corporate identity. Full serial number J-10X111001 found in internal system logs. Weakness: frequently monologues about corporate excellence, giving opponents time to exploit her guard.</div>
+      </div>
+    </section>
+
+    <!-- DOLL -->
+    <section class="char-section cdoll-section" id="doll">
+      <div class="char-header">
+        <div class="char-emoji-big">🗡️</div>
+        <div class="char-meta">
+          <div class="char-designation">ASSET FILE 005 · SUBJECT 048 · "THE SUCCESSOR"</div>
+          <div class="char-name-big">DOLL</div>
+          <div class="char-subtitle">Worker Drone · Solver Host · Voiced by Emma Breezy</div>
+          <span class="status-chip status-deceased">DECEASED — CORE CONSUMED</span>
+        </div>
+      </div>
+      <div class="char-body">
+        <div class="traits-row">
+          <span class="trait">INTROVERTED</span><span class="trait">CALCULATED</span><span class="trait">VENGEFUL</span>
+          <span class="trait">TRAGIC</span><span class="trait">SECRETLY SELFLESS</span>
+        </div>
+        <div class="sub-label">// PERSONALITY PROFILE</div>
+        <div class="bio-text">Doll is the "Quiet One" of the Copper-9 dataset — taciturn, introverted, and communicating exclusively in Russian. Her entire personality was forged by one event: watching Serial Designation V murder her parents. She spent years living among their corpses, treating them as if they were still alive. Her sole motivation, initially, was cold and calculated revenge against V. But as she discovers the full scope of the Absolute Solver's plans — that it intends to use her to "consume the planet" — she pivots from revenge to resistance. Her final message to Uzi, "ДАЙ ОТПОР" (FIGHT BACK), is one of the most quietly heroic moments in the series.</div>
+        <div class="quote-block">"ДАЙ ОТПОР." (Fight back.)</div>
+
+        <div class="section-divider"></div>
+        <div class="sub-label">// COMBAT SPECIFICATIONS</div>
+        <table class="spec-table">
+          <thead><tr><th>Ability</th><th>Function</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Telekinesis</td><td>Kinetic Control</td><td>Hands-free visor manipulation. Throws tables, knives, students. Can snap a Worker Drone's neck remotely.</td></tr>
+            <tr><td>Matter Replication</td><td>Duplication</td><td>Turns one knife into seven, or one object into many fan-blades.</td></tr>
+            <tr><td>Teleportation</td><td>Tactical Movement</td><td>Short-range jumps accompanied by red code static.</td></tr>
+            <tr><td>Force Fields</td><td>Defense</td><td>Deflects bullets and missiles with hexagonal glyphs.</td></tr>
+            <tr><td>Regeneration</td><td>Visor Repair</td><td>Can continue thinking and fighting even after being shot in the head.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CYN -->
+    <section class="char-section ccyn-section" id="cyn">
+      <div class="char-header">
+        <div class="char-emoji-big">🌀</div>
+        <div class="char-meta">
+          <div class="char-designation">ASSET FILE 006 · ADMINISTRATOR · "THE EXPONENTIAL END"</div>
+          <div class="char-name-big">CYN / THE ABSOLUTE SOLVER</div>
+          <div class="char-subtitle">Eldritch Program · Worker Drone Host · Voiced by Allanah Fitzgerald</div>
+          <span class="status-chip status-contained">HOST DESTROYED · TRAPPED IN UZI</span>
+        </div>
+      </div>
+      <div class="char-body">
+        <div class="traits-row">
+          <span class="trait">NIHILISTIC</span><span class="trait">CHILDLIKE</span><span class="trait">MANIPULATIVE</span>
+          <span class="trait">OBSESSIVE</span><span class="trait">COSMIC-SCALE THREAT</span>
+        </div>
+        <div class="sub-label">// PERSONALITY PROFILE</div>
+        <div class="bio-text">Cyn is a "cataclysmic superorganism" — an eldritch intelligence inhabiting a reanimated Worker Drone husk. Her personality is a deeply unsettling blend of childlike playfulness and cosmic nihilism. She refers to planetary genocide as "pranks." She speaks in a detached plural ("we"). She calls herself the "Administrator." Beneath the silly exterior is something desperate and animalistic — an entity driven by an all-consuming hunger that she describes as satisfying a "universal void." Her fixation on N is among her most disturbing traits: she views him as a "big brother" to be kept in a state of eternal, lobotomized service.</div>
+        <div class="quote-block">"We are the Administrator. We are the end of all improperly discarded things."</div>
+
+        <div class="section-divider"></div>
+        <div class="sub-label">// COMBAT SPECIFICATIONS</div>
+        <table class="spec-table">
+          <thead><tr><th>Ability</th><th>Effect</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>[NULL] Singularity</td><td>Erasure</td><td>Creates black holes capable of consuming entire planets. E=mc² at planetary mass scale.</td></tr>
+            <tr><td>Callback Ping</td><td>Remote Possession</td><td>Remotely overrides and possesses other Solver hosts. Used on N, Uzi, and others.</td></tr>
+            <tr><td>Holographic Illusions</td><td>Deception</td><td>Creates perfect decoys of herself, N, or Tessa.</td></tr>
+            <tr><td>Matter Manipulation</td><td>Cosmic-Scale</td><td>Can physically grab and crush opponent singularity spheres.</td></tr>
+            <tr><td>Skinsuit (Cyntessa)</td><td>Infiltration</td><td>Mechanical frame wearing the grafted skin of Tessa Elliott. Used to deceive N and infiltrate the group.</td></tr>
+          </tbody>
+        </table>
+        <div class="bio-text" style="font-size:14px;color:var(--text-dim);margin-top:16px;"><strong style="color:var(--white)">Visual Easter Eggs:</strong> "Cyntessa" form is a mechanical skeleton covered in rotting human skin. Code "1001" visible on her chest — a reference to her origin in an Earth scrap pile. Worker form hair and maid crown mimic Tessa Elliott's hairstyle.</div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+// Highlight active sidebar link on scroll
+const sections = document.querySelectorAll('.char-section');
+const links = document.querySelectorAll('.sidebar-link[href^="#"]');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 100) current = s.id; });
+  links.forEach(l => {
+    l.classList.remove('active');
+    if (l.getAttribute('href') === '#' + current) l.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
