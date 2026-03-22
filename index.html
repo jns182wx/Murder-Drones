@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copper-9 Archives | Murder Drones Fan Site</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --yellow: #f5c400;
+    --yellow-glow: #ffe066;
+    --red: #e8272b;
+    --dark: #07090e;
+    --dark2: #0c0f18;
+    --panel: #0f1320;
+    --border: #1c2235;
+    --border2: #252d42;
+    --text: #b8c4d8;
+    --text-dim: #4a5568;
+    --white: #eef2ff;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  /* scanlines */
+  body::after {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:9999;
+    background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.06) 2px,rgba(0,0,0,0.06) 4px);
+  }
+  /* animated star/grid bg */
+  .bg {
+    position:fixed; inset:0; z-index:0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(245,196,0,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 80% at 80% 90%, rgba(232,39,43,0.04) 0%, transparent 60%),
+      linear-gradient(180deg, #07090e 0%, #0a0d16 100%);
+  }
+  .bg-grid {
+    position:fixed; inset:0; z-index:0;
+    background-image: linear-gradient(rgba(245,196,0,0.025) 1px,transparent 1px), linear-gradient(90deg,rgba(245,196,0,0.025) 1px,transparent 1px);
+    background-size:60px 60px;
+  }
+  .wrap { position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:0 24px 80px; }
+
+  /* ===== HERO ===== */
+  .hero {
+    text-align:center; padding:80px 0 60px;
+    animation: fadeDown 0.9s ease both;
+  }
+  .hero-eyebrow {
+    font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:5px;
+    color:var(--yellow); opacity:0.7; margin-bottom:20px; text-transform:uppercase;
+  }
+  .hero h1 {
+    font-family:'Orbitron',monospace; font-size:clamp(36px,7vw,72px); font-weight:900;
+    color:var(--white); line-height:1; letter-spacing:-2px;
+    text-shadow:0 0 40px rgba(245,196,0,0.35), 0 0 100px rgba(245,196,0,0.1);
+    margin-bottom:6px;
+  }
+  .hero h1 em { color:var(--yellow); font-style:normal; display:block; }
+  .hero-sub {
+    font-size:17px; color:var(--text-dim); font-weight:300; letter-spacing:1px;
+    margin:16px 0 36px;
+  }
+  .hero-divider {
+    width:120px; height:1px; margin:0 auto;
+    background:linear-gradient(90deg,transparent,var(--yellow),transparent);
+  }
+  /* status bar */
+  .status-bar {
+    display:flex; justify-content:center; gap:32px; flex-wrap:wrap;
+    margin-top:28px; font-family:'Share Tech Mono',monospace; font-size:11px;
+    letter-spacing:2px; color:var(--text-dim);
+  }
+  .status-item { display:flex; align-items:center; gap:8px; }
+  .status-dot { width:6px; height:6px; border-radius:50%; background:var(--yellow); box-shadow:0 0 8px var(--yellow); animation:blink 2s infinite; }
+  .status-dot.red { background:var(--red); box-shadow:0 0 8px var(--red); animation-delay:0.5s; }
+  .status-dot.blue { background:#00c4ff; box-shadow:0 0 8px #00c4ff; animation-delay:1s; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ===== SECTION LABEL ===== */
+  .section-label {
+    font-family:'Share Tech Mono',monospace; font-size:11px; letter-spacing:4px;
+    color:var(--yellow); opacity:0.6; margin-bottom:20px; text-transform:uppercase;
+  }
+
+  /* ===== MAIN CARDS GRID ===== */
+  .cards-grid {
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+    gap:16px; margin-bottom:48px;
+    animation: fadeUp 0.7s 0.2s ease both;
+  }
+  .card {
+    background:var(--panel); border:1px solid var(--border); border-radius:4px;
+    padding:28px; position:relative; overflow:hidden;
+    transition:all 0.25s ease; text-decoration:none; display:block; color:inherit;
+  }
+  .card::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg,var(--yellow),transparent);
+    opacity:0; transition:opacity 0.25s;
+  }
+  .card:hover { border-color:var(--border2); transform:translateY(-3px); box-shadow:0 12px 40px rgba(0,0,0,0.4); }
+  .card:hover::before { opacity:1; }
+  .card.accent-red::before { background:linear-gradient(90deg,var(--red),transparent); }
+  .card.accent-purple::before { background:linear-gradient(90deg,#8b3cf7,transparent); }
+  .card.accent-blue::before { background:linear-gradient(90deg,#00c4ff,transparent); }
+  .card.accent-green::before { background:linear-gradient(90deg,#00e5a0,transparent); }
+  .card.accent-orange::before { background:linear-gradient(90deg,#ff7c2a,transparent); }
+  .card-icon { font-size:36px; margin-bottom:16px; display:block; }
+  .card-tag {
+    font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:3px;
+    color:var(--yellow); opacity:0.6; margin-bottom:8px; text-transform:uppercase;
+  }
+  .card.accent-red .card-tag { color:var(--red); }
+  .card.accent-purple .card-tag { color:#c084fc; }
+  .card.accent-blue .card-tag { color:#7dd3fc; }
+  .card.accent-green .card-tag { color:#00e5a0; }
+  .card.accent-orange .card-tag { color:#ff9a5c; }
+  .card h2 { font-family:'Orbitron',monospace; font-size:18px; font-weight:700; color:var(--white); margin-bottom:10px; }
+  .card p { font-size:15px; line-height:1.6; color:var(--text-dim); font-weight:300; }
+  .card-arrow {
+    position:absolute; bottom:20px; right:20px;
+    font-family:'Share Tech Mono',monospace; font-size:14px; color:var(--border2);
+    transition:all 0.2s; opacity:0;
+  }
+  .card:hover .card-arrow { opacity:1; color:var(--yellow); transform:translateX(4px); }
+  .card-badge {
+    position:absolute; top:16px; right:16px;
+    font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:2px;
+    padding:4px 8px; border-radius:2px; text-transform:uppercase;
+  }
+  .badge-live { background:rgba(0,229,160,0.1); border:1px solid rgba(0,229,160,0.3); color:#00e5a0; }
+  .badge-new { background:rgba(245,196,0,0.1); border:1px solid rgba(245,196,0,0.3); color:var(--yellow); }
+  .badge-soon { background:rgba(255,124,42,0.1); border:1px solid rgba(255,124,42,0.3); color:#ff9a5c; }
+
+  /* ===== FEATURED ROW ===== */
+  .featured-row {
+    display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;
+    animation: fadeUp 0.7s 0.3s ease both;
+  }
+  @media(max-width:640px){ .featured-row { grid-template-columns:1fr; } }
+  .card-wide { grid-column:1/-1; }
+
+  /* ===== CHARACTER STRIP ===== */
+  .char-strip {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:48px;
+    animation: fadeUp 0.7s 0.4s ease both;
+  }
+  @media(max-width:600px){ .char-strip { grid-template-columns:repeat(2,1fr); } }
+  .char-card {
+    background:var(--panel); border:1px solid var(--border); border-radius:4px;
+    padding:20px 16px; text-align:center; text-decoration:none; color:inherit;
+    transition:all 0.2s ease; position:relative; overflow:hidden;
+  }
+  .char-card::after {
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(135deg,rgba(255,255,255,0.02),transparent);
+    pointer-events:none;
+  }
+  .char-card:hover { transform:translateY(-4px); }
+  .char-card.cn:hover { border-color:rgba(245,196,0,0.5); box-shadow:0 8px 30px rgba(245,196,0,0.1); }
+  .char-card.cuzi:hover { border-color:rgba(139,60,247,0.5); box-shadow:0 8px 30px rgba(139,60,247,0.1); }
+  .char-card.cv:hover { border-color:rgba(232,39,43,0.5); box-shadow:0 8px 30px rgba(232,39,43,0.1); }
+  .char-card.cj:hover { border-color:rgba(0,196,255,0.5); box-shadow:0 8px 30px rgba(0,196,255,0.1); }
+  .char-emoji { font-size:32px; display:block; margin-bottom:10px; }
+  .char-name { font-family:'Orbitron',monospace; font-size:14px; font-weight:700; color:var(--white); margin-bottom:4px; }
+  .char-role { font-family:'Share Tech Mono',monospace; font-size:10px; letter-spacing:2px; }
+  .cn .char-role { color:var(--yellow); }
+  .cuzi .char-role { color:#c084fc; }
+  .cv .char-role { color:#ff6b6b; }
+  .cj .char-role { color:#7dd3fc; }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    border-top:1px solid var(--border); padding-top:32px; margin-top:32px;
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;
+    font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--text-dim);
+    letter-spacing:2px;
+    animation: fadeUp 0.7s 0.5s ease both;
+  }
+  .footer a { color:var(--text-dim); text-decoration:none; transition:color 0.2s; }
+  .footer a:hover { color:var(--yellow); }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fadeDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="bg-grid"></div>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-eyebrow">// COPPER-9 ARCHIVES · UNAUTHORIZED ACCESS WELCOME</div>
+    <h1>MURDER <em>DRONES</em></h1>
+    <p class="hero-sub">Fan-built archive, analysis, and interactive content · Built on GitHub Pages</p>
+    <div class="hero-divider"></div>
+    <div class="status-bar">
+      <span class="status-item"><span class="status-dot"></span>OUTPOST 3 ONLINE</span>
+      <span class="status-item"><span class="status-dot red"></span>SOLVER: CONTAINED</span>
+      <span class="status-item"><span class="status-dot blue"></span>N + UZI: ACTIVE</span>
+    </div>
+  </div>
+
+  <!-- CHARACTERS -->
+  <div class="section-label">// PRIMARY ASSETS · COPPER-9 DOSSIER</div>
+  <div class="char-strip">
+    <a href="wiki.html#n" class="char-card cn">
+      <span class="char-emoji">🖤</span>
+      <div class="char-name">N</div>
+      <div class="char-role">THE HEART</div>
+    </a>
+    <a href="wiki.html#uzi" class="char-card cuzi">
+      <span class="char-emoji">⚡</span>
+      <div class="char-name">UZI</div>
+      <div class="char-role">THE REBEL</div>
+    </a>
+    <a href="wiki.html#v" class="char-card cv">
+      <span class="char-emoji">🩸</span>
+      <div class="char-name">V</div>
+      <div class="char-role">THE SHADOW</div>
+    </a>
+    <a href="wiki.html#j" class="char-card cj">
+      <span class="char-emoji">💼</span>
+      <div class="char-name">J</div>
+      <div class="char-role">THE BLADE</div>
+    </a>
+  </div>
+
+  <!-- MAIN SECTIONS -->
+  <div class="section-label">// SITE SECTIONS</div>
+
+  <!-- Featured top row -->
+  <div class="featured-row">
+    <a href="quiz.html" class="card accent-purple">
+      <span class="card-badge badge-live">LIVE</span>
+      <span class="card-icon">🤖</span>
+      <div class="card-tag">Interactive · 25 Questions</div>
+      <h2>PERSONALITY QUIZ</h2>
+      <p>Which Murder Drone are you? Answer 25 questions to find your character match — N, Uzi, V, or J — with a full personality breakdown.</p>
+      <span class="card-arrow">→</span>
+    </a>
+    <a href="wiki.html" class="card accent-yellow">
+      <span class="card-badge badge-live">LIVE</span>
+      <span class="card-icon">📁</span>
+      <div class="card-tag">Character Dossiers · Lore</div>
+      <h2>CHARACTER WIKI</h2>
+      <p>Deep-dive dossiers on every major character — personality profiles, combat specs, episode timelines, and key relationships.</p>
+      <span class="card-arrow">→</span>
+    </a>
+  </div>
+
+  <!-- Main cards grid -->
+  <div class="cards-grid">
+    <a href="episodes.html" class="card accent-red">
+      <span class="card-badge badge-soon">COMING SOON</span>
+      <span class="card-icon">🎬</span>
+      <div class="card-tag">All 8 Episodes</div>
+      <h2>EPISODE GUIDE</h2>
+      <p>Track every episode from the Pilot to Absolute End — summaries, key moments, and a personal rating tracker.</p>
+      <span class="card-arrow">→</span>
+    </a>
+    <a href="lore.html" class="card accent-blue">
+      <span class="card-badge badge-soon">COMING SOON</span>
+      <span class="card-icon">🌌</span>
+      <div class="card-tag">Timeline · The Solver</div>
+      <h2>LORE & TIMELINE</h2>
+      <p>The full chronological history of Copper-9, the Absolute Solver, and JCJenson — from Earth's fall to the Absolute End.</p>
+      <span class="card-arrow">→</span>
+    </a>
+    <a href="podcast.html" class="card accent-orange">
+      <span class="card-badge badge-soon">COMING SOON</span>
+      <span class="card-icon">🎙️</span>
+      <div class="card-tag">NotebookLM Audio</div>
+      <h2>PODCAST EPISODES</h2>
+      <p>AI-generated deep-dive audio episodes on Murder Drones topics — character analysis, lore debates, and theories.</p>
+      <span class="card-arrow">→</span>
+    </a>
+    <a href="fanart.html" class="card accent-green">
+      <span class="card-badge badge-soon">COMING SOON</span>
+      <span class="card-icon">🎨</span>
+      <div class="card-tag">Gallery</div>
+      <h2>FAN ART GALLERY</h2>
+      <p>A curated gallery of fan art from across the community, organized by character with artist credits.</p>
+      <span class="card-arrow">→</span>
+    </a>
+    <a href="theories.html" class="card">
+      <span class="card-badge badge-soon">COMING SOON</span>
+      <span class="card-icon">🔭</span>
+      <div class="card-tag">Fan Theories</div>
+      <h2>THEORIES & ANALYSIS</h2>
+      <p>Deep-cut fan theories, story analysis, and unanswered questions from the series — debated and ranked.</p>
+      <span class="card-arrow">→</span>
+    </a>
+    <a href="about.html" class="card">
+      <span class="card-icon">⚙️</span>
+      <div class="card-tag">About This Site</div>
+      <h2>ABOUT & CREDITS</h2>
+      <p>Built as a fan project to learn web development. Murder Drones is created by Liam Vickers and produced by Glitch Productions.</p>
+      <span class="card-arrow">→</span>
+    </a>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div>// COPPER-9 ARCHIVES · UNAUTHORIZED FAN ARCHIVE</div>
+    <div>
+      MURDER DRONES © <a href="https://www.glitch.productions" target="_blank">GLITCH PRODUCTIONS</a> ·
+      <a href="https://www.youtube.com/@GlitchProductions" target="_blank">YOUTUBE</a> ·
+      FAN SITE · NOT AFFILIATED
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
